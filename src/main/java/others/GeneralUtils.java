@@ -1,4 +1,4 @@
-package output;
+package others;
 
 import org.apache.commons.lang3.StringUtils;
 import s2rquality.NLAction;

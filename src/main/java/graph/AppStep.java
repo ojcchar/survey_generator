@@ -1,8 +1,8 @@
 package graph;
 
 import com.google.gson.annotations.Expose;
-import output.DeviceHelper;
-import output.GeneralUtils;
+import others.DeviceHelper;
+import others.GeneralUtils;
 
 import java.io.Serializable;
 

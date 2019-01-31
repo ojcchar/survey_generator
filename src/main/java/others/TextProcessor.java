@@ -1,4 +1,4 @@
-package graph;
+package others;
 
 public class TextProcessor {
 

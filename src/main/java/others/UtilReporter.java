@@ -26,7 +26,7 @@
  * of the authors and should not be interpreted as representing official policies,
  * either expressed or implied, of the FreeBSD Project.
  *******************************************************************************/
-package output;
+package others;
 
 import graph.AppGuiComponent;
 import graph.AppStep;

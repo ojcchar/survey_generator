@@ -2,7 +2,8 @@ package graph;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.text.WordUtils;
-import output.DeviceHelper;
+import others.TextProcessor;
+import others.DeviceHelper;
 
 import java.io.Serializable;
 import java.util.Arrays;

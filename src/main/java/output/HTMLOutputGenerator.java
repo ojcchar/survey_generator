@@ -9,6 +9,9 @@ import graph.AppGuiComponent;
 import graph.AppStep;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
+import others.AppNamesMappings;
+import others.GeneralUtils;
+import others.UtilReporter;
 import s2rquality.*;
 
 import java.io.File;
