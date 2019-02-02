@@ -137,7 +137,7 @@ public class HTMLOutputGenerator extends EulerOutputGenerator {
         return feedbackInfo.toString();
     }
 
-    private String getCategoryAssessment(S2RQualityAssessment feedback, NLAction action) {
+    protected String getCategoryAssessment(S2RQualityAssessment feedback, NLAction action) {
         final S2RQualityCategory category = feedback.getCategory();
         if (category == null) return "";
         switch (feedback.getCategory()) {
@@ -192,7 +192,7 @@ public class HTMLOutputGenerator extends EulerOutputGenerator {
                 .collect(Collectors.joining(" or "));
     }
 
-    private String getObjs(NLAction action) {
+    protected String getObjs(NLAction action) {
         StringBuilder builder = new StringBuilder();
         builder.append(StringUtils.isEmpty(action.getObject()) ? "" : action.getObject());
         builder.append(" ");
@@ -202,7 +202,7 @@ public class HTMLOutputGenerator extends EulerOutputGenerator {
         return builder.toString().trim();
     }
 
-    private String getItemsFeedback(S2RQualityAssessment feedback, File imgsFolder) throws IOException {
+    protected String getItemsFeedback(S2RQualityAssessment feedback, File imgsFolder) throws IOException {
         StringBuilder items = new StringBuilder();
 
         if (feedback.getCategory() == null) return items.toString();
@@ -285,7 +285,7 @@ public class HTMLOutputGenerator extends EulerOutputGenerator {
      * @param category
      * @return
      */
-    private String getFeedbackStyle(S2RQualityCategory category) {
+    protected String getFeedbackStyle(S2RQualityCategory category) {
         String style = "";
 
         if (category == null) return style;
@@ -318,14 +318,13 @@ public class HTMLOutputGenerator extends EulerOutputGenerator {
 
     public static void main(String[] args) throws Exception {
 
-//        generatQualityReportForAllBugReports();
+             //generatQualityReportForAllBugReports();
 
              generateQualityReportForOneBugReport();
     }
 
     private static void generatQualityReportForAllBugReports() throws Exception {
-        String outFolder = "C:\\Users\\ojcch\\Documents\\Repositories\\Git\\Android-Bug-Report-Reproduction" +
-                "\\EulerEvaluation\\ToolOutput";
+        String outFolder = "/Users/mdipenta/euler-data/tool-output/";
         HTMLOutputGenerator generator = new HTMLOutputGenerator();
 
         final File[] subFolders = new File(outFolder).listFiles(File::isDirectory);
@@ -334,6 +333,8 @@ public class HTMLOutputGenerator extends EulerOutputGenerator {
                     bugFolder.getName() + ".json").toFile();
             if (jsonReportFile.exists()) {
                 LOGGER.debug(jsonReportFile.getAbsolutePath());
+
+                System.out.println("ciao");
                 generator.generateOutput(bugFolder);
             }
         }
@@ -342,8 +343,7 @@ public class HTMLOutputGenerator extends EulerOutputGenerator {
     private static void generateQualityReportForOneBugReport() {
         HTMLOutputGenerator generator = new HTMLOutputGenerator();
         try {
-            File bugFolder = new File("C:\\Users\\ojcch\\Documents\\Repositories\\Git\\Android-Bug-Report" +
-                    "-Reproduction\\EulerEvaluation\\ToolOutput\\ATimeTracker#0.20_46");
+            File bugFolder = new File("/Users/mdipenta/euler-data/ATimeTracker#0.20_46");
             generator.generateOutput(bugFolder);
         } catch (Exception e) {
             e.printStackTrace();
