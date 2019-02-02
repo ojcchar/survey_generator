@@ -10,6 +10,7 @@ import graph.AppStep;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import others.AppNamesMappings;
+import others.DeviceUtils;
 import others.GeneralUtils;
 import others.UtilReporter;
 import s2rquality.*;
@@ -46,7 +47,8 @@ public class HTMLOutputGenerator extends EulerOutputGenerator {
     public void generateOutput(File bugFolder) throws Exception {
         File jsonReportFile = Paths.get(bugFolder.getAbsolutePath(),
                 bugFolder.getName() + ".json").toFile();
-        BRQualityReport report = gson.fromJson(new FileReader(jsonReportFile),                BRQualityReport.class);
+        BRQualityReport report = gson.fromJson(new FileReader(jsonReportFile),
+                BRQualityReport.class);
         generateOutput(bugFolder, report);
     }
 
@@ -64,10 +66,11 @@ public class HTMLOutputGenerator extends EulerOutputGenerator {
 
         final String parentFolder = outputFile.getParent();
         final File imgsFolder = Paths.get(parentFolder, "html_imgs").toFile();
-        if (!imgsFolder.exists()) {
-            final boolean folderCreated = imgsFolder.mkdirs();
-            if (!folderCreated) throw new Exception("Could not create the imgs folder: " + imgsFolder);
+        if (imgsFolder.exists()) {
+            FileUtils.forceDelete(imgsFolder);
         }
+        final boolean folderCreated = imgsFolder.mkdirs();
+        if (!folderCreated) throw new Exception("Could not create the imgs folder: " + imgsFolder);
 
         List<String> parameters = new ArrayList<>();
         parameters.add(getApplicationName(qualityReport));
@@ -115,8 +118,8 @@ public class HTMLOutputGenerator extends EulerOutputGenerator {
     }
 
     protected String getFeedbackInfo(List<S2RQualityAssessment> qualityAssessments,
-                                   String feedbackTemplate,
-                                   File imgsFolder, NLAction action) throws IOException {
+                                     String feedbackTemplate,
+                                     File imgsFolder, NLAction action) throws IOException {
         StringBuilder feedbackInfo = new StringBuilder();
 
         if (qualityAssessments == null || qualityAssessments.isEmpty())
@@ -129,7 +132,7 @@ public class HTMLOutputGenerator extends EulerOutputGenerator {
             final S2RQualityCategory category = feedback.getCategory();
             parameters.add(getFeedbackStyle(category));
             parameters.add(category == null ? "" : category.getCode());
-            parameters.add(getCategoryAssessment(feedback, action));
+            parameters.add(getCategoryStatement(feedback, action));
             parameters.add(getItemsFeedback(feedback, imgsFolder));
             feedbackInfo.append(GeneralUtils.replaceHTML(feedbackTemplate, parameters));
         }
@@ -137,7 +140,7 @@ public class HTMLOutputGenerator extends EulerOutputGenerator {
         return feedbackInfo.toString();
     }
 
-    protected String getCategoryAssessment(S2RQualityAssessment feedback, NLAction action) {
+    protected String getCategoryStatement(S2RQualityAssessment feedback, NLAction action) {
         final S2RQualityCategory category = feedback.getCategory();
         if (category == null) return "";
         switch (feedback.getCategory()) {
@@ -188,7 +191,7 @@ public class HTMLOutputGenerator extends EulerOutputGenerator {
         if (components.size() < limit)
             limit = components.size();
         return components.subList(0, limit).stream()
-                .map(UtilReporter::getComponentDescription)
+                .map(c -> "the " + UtilReporter.getComponentDescription(c))
                 .collect(Collectors.joining(" or "));
     }
 
@@ -224,12 +227,59 @@ public class HTMLOutputGenerator extends EulerOutputGenerator {
             case LOW_Q_VOCAB_MISMATCH:
                 break;
             case MISSING:
-                addSteps(feedback.getInferredSteps(), items, imgsFolder);
+                final List<AppStep> inferredSteps = feedback.getInferredSteps();
+                final List<AppStep> cleanedInferredSteps = cleanSteps(inferredSteps);
+                addSteps(cleanedInferredSteps, items, imgsFolder);
                 break;
             default:
                 break;
         }
         return items.toString();
+    }
+
+    private List<AppStep> cleanSteps(List<AppStep> steps) {
+
+        if (steps == null) return null;
+        if (steps.isEmpty()) return steps;
+
+        List<AppStep> cleanedSteps = new ArrayList<>();
+        for (int i = 0; i < steps.size(); ) {
+            final AppStep appStep = steps.get(i);
+            AppStep nextStep = null;
+            if ((i + 1) < steps.size()) {
+                nextStep = steps.get(i + 1);
+            }
+
+            if (nextStep != null) {
+
+                AppStep nextNextStep = null;
+                if ((i + 2) < steps.size()) {
+                    nextNextStep = steps.get(i + 2);
+                }
+
+                if (nextNextStep != null) {
+                    if (
+                            (DeviceUtils.isType(nextStep.getAction()) &&
+                                    DeviceUtils.isClick(appStep.getAction()) &&
+                                    DeviceUtils.isClick(nextNextStep.getAction())
+                            ) &&
+                                    (appStep.getComponent().getDbId().equals(nextStep.getComponent().getDbId())
+                                            && nextStep.getComponent().getDbId().equals(nextNextStep.getComponent().getDbId()))
+                    ) {
+
+                        cleanedSteps.add(nextStep);
+                        i = i+3;
+                        continue;
+                    }
+                }
+            }
+
+            cleanedSteps.add(appStep);
+
+            i++;
+
+        }
+        return cleanedSteps;
     }
 
     private void addAmbiguousCases(List<String> cases, StringBuilder items) {
@@ -249,11 +299,13 @@ public class HTMLOutputGenerator extends EulerOutputGenerator {
             return;
         }
 
+        int stepId = 1;
         for (AppStep step : steps) {
             final String screenshotFilePath = step.getScreenshotFile();
             items.append("<li>");
-            if (StringUtils.isEmpty(screenshotFilePath)) {
-                items.append(UtilReporter.getNLStep(step));
+            if (StringUtils.isEmpty(screenshotFilePath) || DeviceUtils.isClickMenuButton(step.getAction()) ||
+                    DeviceUtils.isClickBackButton(step.getAction()) || DeviceUtils.isChangeRotation(step.getAction())) {
+                items.append(stepId + ". " + UtilReporter.getNLStep(step, false));
             } else {
                 File screenshotFile = new File(screenshotFilePath);
                 if (!screenshotFile.exists()) {
@@ -263,7 +315,7 @@ public class HTMLOutputGenerator extends EulerOutputGenerator {
 
                 if (!screenshotFile.exists()) {
                     LOGGER.warn("Screenshot file does not exist: " + screenshotFile);
-                    items.append(UtilReporter.getNLStep(step));
+                    items.append(stepId + ". " + UtilReporter.getNLStep(step, false));
                 } else {
                     File destFile = Paths.get(imgsFolder.getAbsolutePath(), screenshotFile.getName()).toFile();
                     FileUtils.copyFile(screenshotFile, destFile);
@@ -273,11 +325,12 @@ public class HTMLOutputGenerator extends EulerOutputGenerator {
                             .append("\" data =\"")
                             .append(Paths.get(imgsFolder.getName(), destFile.getName()).toString())
                             .append("\">")
-                            .append(UtilReporter.getNLStep(step))
+                            .append(stepId + ". " + UtilReporter.getNLStep(step, false))
                             .append("</div>");
                 }
             }
             items.append("</li>");
+            stepId++;
         }
     }
 
@@ -318,9 +371,9 @@ public class HTMLOutputGenerator extends EulerOutputGenerator {
 
     public static void main(String[] args) throws Exception {
 
-             //generatQualityReportForAllBugReports();
+        //generatQualityReportForAllBugReports();
 
-             generateQualityReportForOneBugReport();
+        generateQualityReportForOneBugReport();
     }
 
     private static void generatQualityReportForAllBugReports() throws Exception {
@@ -343,7 +396,9 @@ public class HTMLOutputGenerator extends EulerOutputGenerator {
     private static void generateQualityReportForOneBugReport() {
         HTMLOutputGenerator generator = new HTMLOutputGenerator();
         try {
-            File bugFolder = new File("/Users/mdipenta/euler-data/ATimeTracker#0.20_46");
+//            File bugFolder = new File("/Users/mdipenta/euler-data/ATimeTracker#0.20_46");
+            File bugFolder = new File("C:\\Users\\ojcch\\Documents\\Repositories\\Git\\Android-Bug-Report" +
+                    "-Reproduction\\EulerEvaluation\\ToolOutput\\ATimeTracker#0.20_46");
             generator.generateOutput(bugFolder);
         } catch (Exception e) {
             e.printStackTrace();

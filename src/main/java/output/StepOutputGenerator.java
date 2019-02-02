@@ -130,7 +130,7 @@ public class StepOutputGenerator extends HTMLOutputGenerator {
             final S2RQualityCategory category = feedback.getCategory();
             parameters.add(getFeedbackStyle(category));
             parameters.add(category == null ? "" : category.getCode());
-            parameters.add(getCategoryAssessment(feedback, action));
+            parameters.add(getCategoryStatement(feedback, action));
             parameters.add(getItemsFeedback(feedback, imgsFolder));
             //feedbackInfo.append());
 

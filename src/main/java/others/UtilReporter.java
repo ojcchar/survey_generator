@@ -50,18 +50,39 @@ public class UtilReporter {
         COMPONENT_TRANSLATIONS.put("Linear Layout", "View");
         COMPONENT_TRANSLATIONS.put("Spinner", "Drop Down List");
     }
-    
+
+
     public static String getNLStep(AppStep step) {
+        return getNLStep(null, step, true);
+    }
+
+    public static String getNLStep(AppStep step, boolean displayScreen) {
+        return getNLStep(null, step, displayScreen);
+    }
+
+    public static String getNLStep(ActionMatch actionMatch, AppStep step, boolean displayScreen) {
         Integer action = step.getAction();
 
         if (DeviceHelper.OPEN_APP == action) {
             return "Open the application";
         }
 
+        if (DeviceHelper.MENU_BTN == action) {
+            return "Press the menu button";
+        }
+
+        if (DeviceHelper.BACK == action) {
+            return "Tap the back button";
+        }
+
+        if (DeviceHelper.ROTATION == action){
+            return "Rotate the screen";
+        }
+
         StringBuilder builder = new StringBuilder();
 
         AppGuiComponent component = step.getComponent();
-        if (component != null) {
+        if (displayScreen && component != null) {
 
             builder.append("On the \"");
             String windowString = GraphTransition.getWindowString(component.getActivity(),
@@ -76,7 +97,12 @@ public class UtilReporter {
         }
 
         // action
-        builder.append(GraphTransition.getAction(action));
+        String actionString = GraphTransition.getAction(action);
+        if (!displayScreen){
+            actionString =StringUtils.capitalize(actionString);
+        }
+
+        builder.append(actionString);
         builder.append(" ");
 
         // the action text
@@ -87,6 +113,9 @@ public class UtilReporter {
             builder.append(" ");
             if (!stepText.trim().isEmpty()) {
                 builder.append("(e.g., ");
+                if (actionMatch != null) {
+                    builder.append("one from the bug report or ");
+                }
                 builder.append(stepText);
                 builder.append(")");
                 builder.append(" ");
@@ -101,7 +130,11 @@ public class UtilReporter {
 
         if (component != null) {
 
-            builder.append("on the ");
+            if (DeviceHelper.TYPE == action) {
+                builder.append("on the ");
+            }else {
+                builder.append("the ");
+            }
 
             // -----------------------------------
 
@@ -112,7 +145,6 @@ public class UtilReporter {
 
         return builder.toString().trim();
     }
-
 
     public static String getComponentDescription(AppGuiComponent component) {
         StringBuilder builder =new StringBuilder();
@@ -176,7 +208,7 @@ public class UtilReporter {
 
         return builder.toString();
     }
-    
+
     public static String translateComponent(String componentString) {
         String transComp = COMPONENT_TRANSLATIONS.get(componentString);
         if (transComp == null) {
@@ -184,10 +216,10 @@ public class UtilReporter {
         }
         return transComp;
     }
-    
+
     /**
      * By default the subject is included
-     * 
+     *
      * @param nlAction
      * @param attachType
      * @param includePrefix
@@ -196,7 +228,7 @@ public class UtilReporter {
     public static String getActionString(NLAction nlAction, boolean attachType, boolean includePrefix) {
         return getActionString(nlAction, attachType, includePrefix, true);
     }
-    
+
     public static String getActionString(NLAction nlAction, boolean attachType, boolean includePrefix, boolean includeSubject) {
         StringBuilder builder = new StringBuilder();
 
@@ -236,4 +268,5 @@ public class UtilReporter {
                 //+ nlAction.getSequence() + ". "
                 + StringUtils.capitalize(builder.toString());
     }
+
 }

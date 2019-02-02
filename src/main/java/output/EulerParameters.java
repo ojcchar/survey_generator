@@ -10,7 +10,7 @@ public class EulerParameters {
 
     //general parameters
     public static String SCREENSHOT_PATH = null;
-    public static String CRASHSCOPE_SCREENSHOTS_PATH = null;
+    public static String CRASHSCOPE_SCREENSHOTS_PATH = "C:/Users/ojcch/Documents/Projects/Amadeus/study-data/CS-Data/screenshots";
 
     //algorithm (default) parameters
     public static Boolean RANDOM_EXPLORATION;
