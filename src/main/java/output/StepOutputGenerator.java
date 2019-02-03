@@ -171,14 +171,12 @@ public class StepOutputGenerator extends HTMLOutputGenerator {
         List<String> parametersTable;
 
 
-        int assess=0;
+        int assess = 0;
 
         for (S2RQualityAssessment feedback : qualityAssessments) {
 
 
-
-
-            if(feedback.getCategory()!=S2RQualityCategory.MISSING) {
+            if (feedback.getCategory() != S2RQualityCategory.MISSING) {
                 //StringBuilder tableInfo = new StringBuilder();
                 StringBuilder feedbackInfo = new StringBuilder();
                 assess++;
@@ -199,28 +197,28 @@ public class StepOutputGenerator extends HTMLOutputGenerator {
                 final S2RQualityCategory category = feedback.getCategory();
                 parameters.add(getFeedbackStyle(category));
                 parameters.add(category == null ? "" : category.getCode());
-                parameters.add(getCategoryAssessment(feedback, action));
+                parameters.add(getCategoryStatement(feedback, action));
                 parameters.add(getItemsFeedback(feedback, imgsFolder));
                 //feedbackInfo.append());
 
                 List<String> parametersPrevious;
                 for (int i = 1; i < sequence; i++) {
-                    parametersPrevious=new ArrayList<>();
+                    parametersPrevious = new ArrayList<>();
                     parametersPrevious.add(i + " ");
-                    parametersPrevious.add(steps.get(i-1));
+                    parametersPrevious.add(steps.get(i - 1));
                     parametersPrevious.add("");
                     feedbackInfo.append(GeneralUtils.replaceHTML(rowTableTemplate, parametersPrevious));
 
                 }
-                parametersAll.add("<b>"+sequence + "</b> ");
-                parametersAll.add("<b>"+actionString+"</b>");
-                parametersAll.add("<b>"+GeneralUtils.replaceHTML(feedbackTemplate, parameters)+"</b>");
+                parametersAll.add("<b>" + sequence + "</b> ");
+                parametersAll.add("<b>" + actionString + "</b>");
+                parametersAll.add("<b>" + GeneralUtils.replaceHTML(feedbackTemplate, parameters) + "</b>");
 
                 feedbackInfo.append(GeneralUtils.replaceHTML(rowTableTemplate, parametersAll));
 
 
                 //tableInfo.append(GeneralUtils.replaceHTML(rowTableTemplate, parameters));
-                parametersTable.add(""+sequence);
+                parametersTable.add("" + sequence);
                 parametersTable.add(feedbackInfo.toString());
 
                 String finalReport = GeneralUtils.replaceHTML(htmlTemplate, parametersTable);
@@ -228,7 +226,8 @@ public class StepOutputGenerator extends HTMLOutputGenerator {
             }
 
 
-        //return feedbackInfo.toString();
+            //return feedbackInfo.toString();
+        }
     }
 
 
@@ -293,7 +292,7 @@ public class StepOutputGenerator extends HTMLOutputGenerator {
                 final S2RQualityCategory category = feedback.getCategory();
                 parametersOverview.add(getFeedbackStyle(category));
                 parametersOverview.add(category == null ? "" : category.getCode());
-                parametersOverview.add(getCategoryAssessment(feedback, action));
+                parametersOverview.add(getCategoryStatement(feedback, action));
                 parameters.add(getItemsFeedback(feedback, imgsFolder));
                 //feedbackInfo.append());
 
