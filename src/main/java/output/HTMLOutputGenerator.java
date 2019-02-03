@@ -152,14 +152,14 @@ public class HTMLOutputGenerator extends EulerOutputGenerator {
 
                 if (components != null && actions != null) {
                     final String assessmentTemplate = preFix + "GUI components (e.g., %s) and multiple actions " +
-                            "(e.g., %s)";
+                            "(e.g., %s).";
                     return String.format(assessmentTemplate, getComponentsString(components),
                             getActionsString(actions));
                 } else if (components != null) {
-                    final String assessmentTemplate = preFix + "GUI components (e.g., %s)";
+                    final String assessmentTemplate = preFix + "GUI components (e.g., %s).";
                     return String.format(assessmentTemplate, getComponentsString(components));
                 } else {
-                    final String assessmentTemplate = preFix + "actions (e.g., %s)";
+                    final String assessmentTemplate = preFix + "actions (e.g., %s).";
                     return String.format(assessmentTemplate, getActionsString(actions));
                 }
 
@@ -171,11 +171,18 @@ public class HTMLOutputGenerator extends EulerOutputGenerator {
                 else if (feedback.isVerbVocabMismatch())
                     return String.format("The term \"%s\" does not match an action performed on the app.",
                             action.getAction());
-                else
-                    return String.format("The term \"%s\" does not match a GUI component from the" +
-                                    " app.",
-                            getObjs(action));
+                else {
+                    final String objs = getObjs(action);
+                    if (StringUtils.isEmpty(objs))
+                        return "Some vocabulary of this S2R is missing.";
+                    else
+                        return String.format("The term \"%s\" does not match a GUI component from the" +
+                                " app.", objs);
+                }
             }
+            case LOW_Q_INCORRECT_INPUT:
+                return String.format("This S2R's input value is missing or incorrect. An example of a valid value is:" +
+                        " %s", feedback.getInputValue());
             default:
                 return category.getDescription();
         }
@@ -221,9 +228,9 @@ public class HTMLOutputGenerator extends EulerOutputGenerator {
                 addSteps(feedback.getMatchedSteps(), items, imgsFolder);
                 addSteps(feedback.getInferredSteps(), items, imgsFolder);
                 break;*/
-            case LOW_Q_INCORRECT_INPUT:
+            /*case LOW_Q_INCORRECT_INPUT:
                 items.append("<li>").append(feedback.getInputValue()).append("</li>");
-                break;
+                break;*/
             case LOW_Q_VOCAB_MISMATCH:
                 break;
             case MISSING:
@@ -263,12 +270,16 @@ public class HTMLOutputGenerator extends EulerOutputGenerator {
                                     DeviceUtils.isClick(appStep.getAction()) &&
                                     DeviceUtils.isClick(nextNextStep.getAction())
                             ) &&
-                                    (appStep.getComponent().getDbId().equals(nextStep.getComponent().getDbId())
-                                            && nextStep.getComponent().getDbId().equals(nextNextStep.getComponent().getDbId()))
+                                    (   (appStep.getComponent().getDbId().equals(nextStep.getComponent().getDbId())
+                                            && nextStep.getComponent().getDbId().equals(nextNextStep.getComponent().getDbId())
+                                            ||
+                                            GeneralUtils.equalsNoDimensions(appStep.getComponent(), nextStep.getComponent())
+                                                    && GeneralUtils.equalsNoDimensions(nextStep.getComponent(), nextNextStep.getComponent())
+                                    ))
                     ) {
 
                         cleanedSteps.add(nextStep);
-                        i = i+3;
+                        i = i + 3;
                         continue;
                     }
                 }
@@ -312,6 +323,10 @@ public class HTMLOutputGenerator extends EulerOutputGenerator {
                     screenshotFile = Paths.get(EulerParameters.CRASHSCOPE_SCREENSHOTS_PATH,
                             screenshotFilePath).toFile();
                 }
+                /*else
+                  if (!screenshotFile.getAbsolutePath().contains("1549139945561")){
+                      screenshotFile = new File("This path is not from the current execution!");
+                  }*/
 
                 if (!screenshotFile.exists()) {
                     LOGGER.warn("Screenshot file does not exist: " + screenshotFile);
@@ -396,8 +411,10 @@ public class HTMLOutputGenerator extends EulerOutputGenerator {
     private static void generateQualityReportForOneBugReport() {
         HTMLOutputGenerator generator = new HTMLOutputGenerator();
         try {
+            File bugFolder = new File("C:\\Users\\ojcch\\Documents\\Repositories\\Git\\Android-Bug-Report" +
+                    "-Reproduction\\EulerEvaluation\\ToolOutput\\ATimeTracker#0.20_46");
 //            File bugFolder = new File("/Users/mdipenta/euler-data/ATimeTracker#0.20_46");
-            File bugFolder = new File("/Users/mdipenta/euler-data/ATimeTracker#0.20_46");
+//            File bugFolder = new File("/Users/mdipenta/euler-data/ATimeTracker#0.20_46");
             generator.generateOutput(bugFolder);
         } catch (Exception e) {
             e.printStackTrace();

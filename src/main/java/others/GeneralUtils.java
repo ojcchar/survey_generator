@@ -1,5 +1,6 @@
 package others;
 
+import graph.AppGuiComponent;
 import org.apache.commons.lang3.StringUtils;
 import s2rquality.NLAction;
 
@@ -159,4 +160,14 @@ public class GeneralUtils {
         }
         return eventName;
     }
+
+
+    public static boolean equalsNoDimensions(AppGuiComponent component1, AppGuiComponent component2) {
+        return ((component1.getText() == null ? "" : component1.getText()).equals(
+                component2.getText() == null ? "" : component2.getText()))
+                && component1.getType().equals(component2.getType())
+                && ((component1.getIdXml() == null ? "" : component1.getIdXml()).equals(
+                component2.getIdXml() == null ? "" : component2.getIdXml()));
+    }
+
 }
