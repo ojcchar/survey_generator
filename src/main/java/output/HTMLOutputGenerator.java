@@ -397,8 +397,7 @@ public class HTMLOutputGenerator extends EulerOutputGenerator {
         HTMLOutputGenerator generator = new HTMLOutputGenerator();
         try {
 //            File bugFolder = new File("/Users/mdipenta/euler-data/ATimeTracker#0.20_46");
-            File bugFolder = new File("C:\\Users\\ojcch\\Documents\\Repositories\\Git\\Android-Bug-Report" +
-                    "-Reproduction\\EulerEvaluation\\ToolOutput\\ATimeTracker#0.20_46");
+            File bugFolder = new File("/Users/mdipenta/euler-data/ATimeTracker#0.20_46");
             generator.generateOutput(bugFolder);
         } catch (Exception e) {
             e.printStackTrace();

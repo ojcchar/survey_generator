@@ -309,7 +309,7 @@ public class StepOutputGenerator extends HTMLOutputGenerator {
                 parametersAll.add("<b>"+actionString+"</b>");
                 parametersAll.add("<b>"+GeneralUtils.replaceHTML(feedbackMissingTemplate, parameters)+"</b>");
 
-                parametersAllOverview.add("<b>"+sequence + "</b> ");
+                parametersAllOverview.add("<b>"+sequence+ "</b> ");
                 parametersAllOverview.add("<b>"+actionString+"</b>");
                 parametersAllOverview.add("<b>"+GeneralUtils.replaceHTML(feedbackMissingOverviewTemplate, parametersOverview)+"</b>");
 
