@@ -228,10 +228,6 @@ public class StepOutputGenerator extends HTMLOutputGenerator {
             }
 
 
-
-
-        }
-
         //return feedbackInfo.toString();
     }
 
