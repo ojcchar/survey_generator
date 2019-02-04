@@ -1,3 +1,52 @@
+<style>
+    ul {
+        list-style-type: none;
+    }
+li {
+    list-style-type: none;
+}
+.label {
+    display: inline;
+    padding: .2em .6em .3em;
+    font-size: 75%;
+    font-weight: 700;
+    line-height: 1;
+    color: #fff;
+    text-align: center;
+    white-space: nowrap;
+    vertical-align: baseline;
+    border-radius: .25em;
+}
+
+.my-badge {
+    float: initial !important;
+}
+
+
+.label-success {
+    background-color: #5cb85c;
+}
+
+
+.label-warning {
+    background-color: #f0ad4e;
+}
+
+
+.label-info {
+    background-color: #5bc0de;
+}
+
+
+
+.label-primary {
+    background-color: #337ab7;
+}
+
+
+.label-grey {
+    background-color: #6c757d !important;
+}</style>
 <p><span style="font-family:arial,helvetica,sans-serif;">
 <span style="font-size:16px;">
 <span id="docs-internal-guid-c7e3935b-7fff-542f-0b80-5a7f3bd11eae"><span
@@ -7,10 +56,7 @@ vertical-align: baseline; white-space: pre-wrap;"><span
 id="docs-internal-guid-c7e3935b-7fff-542f-0b80-5a7f3bd11eae"><span
 style="background-color: transparent; font-variant-numeric: normal;
 font-variant-east-asian: normal; vertical-align: baseline;">
-Regarding the suggested missing steps (highlighted) select all the
-    statements below that you agree with (multiple choice). Feel free
-    to review the Quality Report to see the screenshot for each
-    missing step.
+Regarding the suggested missing steps (highlighted) select all the statements below that you agree with (multiple choice). Feel free to review the Quality Report to see the screenshot for each missing step.
 </span></span></span></span></span></span></p>
 
 <p>&nbsp;</p>
@@ -18,9 +64,9 @@ Regarding the suggested missing steps (highlighted) select all the
  <table class="UserTable">
             <thead class="panel-footer">
               <tr>
-                <th>#</th>
-                <th style="width: 250px;">Step to Reproduce (S2R)</th>
-                <th>Lit of Missing Steps</th>
+                <th style="background-color:lightGray">#</th>
+                <th style="width: 250px;background-color:lightGray">Step to Reproduce (S2R)</th>
+                <th style="background-color:lightGray";>List of Missing Steps</th>
               </tr>
             </thead>
             <tbody>
@@ -30,7 +76,23 @@ Regarding the suggested missing steps (highlighted) select all the
 
 <div>&nbsp;</div>
 
-<div>&nbsp;</div>
 
-<div>Useful links:&nbsp;[Quality Report]&nbsp;[Original
-  bug&nbsp;report and video] [Annotation types]</div>
+<ul class="list-group my-list-group">
+            <li class="list-group-item my-item">
+              Exact Match: <span class="label label-success">HQ</span>&nbsp;&nbsp;
+              Ambiguous Step: <span class=" label label-primary my-badge">AS</span>&nbsp;&nbsp;
+              Vocabulary Mismatch: <span class="label label-info my-badge">VM</span>&nbsp;&nbsp;
+              Incorrect Input Value: <span class="label label-grey my-badge">IV</span>&nbsp;&nbsp;
+              Missing Steps: <span class="label label-warning">MS</span>
+            </li>
+          </ul>
+
+	  <p>&nbsp;</p>
+	  
+<div>Useful links:&nbsp;[<a
+  href="https://seers.utdallas.edu/projects/euler/quality_reports/[ 2 ]/[ 2 ].html">Quality Report</a>]&nbsp;[<a
+  href="https://seers.utdallas.edu/projects/euler/bug_reports_videos/[ 2 ]/[ 2 ].html">Original
+  bug&nbsp;report and video</a>] [<a
+  href="https://docs.google.com/document/d/1xaqHZ-fDvISZM-MLa4cpasR1lb6Dg8tGwwcV2XIjYUw/edit?usp=sharing">Annotation
+  types</a>]
+</div>

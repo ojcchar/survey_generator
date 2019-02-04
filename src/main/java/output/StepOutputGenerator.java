@@ -26,10 +26,13 @@ public class StepOutputGenerator extends HTMLOutputGenerator {
     protected String rowListTemplate;
     protected String TableListTemplate;
 
+    protected static String BugName;
+    protected static String Path="/Users/mdipenta/euler-data/";
+
     private static void generateStepReportForOneBugReport() {
         StepOutputGenerator generator = new StepOutputGenerator();
         try {
-            File bugFolder = new File("/Users/mdipenta/euler-data/ATimeTracker#0.20_46");
+            File bugFolder = new File(Path+"ATimeTracker#0.20_46");
             generator.generateOutput(bugFolder);
         } catch (Exception e) {
             e.printStackTrace();
@@ -220,6 +223,8 @@ public class StepOutputGenerator extends HTMLOutputGenerator {
                 //tableInfo.append(GeneralUtils.replaceHTML(rowTableTemplate, parameters));
                 parametersTable.add("" + sequence);
                 parametersTable.add(feedbackInfo.toString());
+                String myBugName=BugName.replaceAll("\\#","%23");
+                parametersTable.add(myBugName);
 
                 String finalReport = GeneralUtils.replaceHTML(htmlTemplate, parametersTable);
                 FileUtils.write(outputFile, finalReport, Charset.defaultCharset());
@@ -296,15 +301,15 @@ public class StepOutputGenerator extends HTMLOutputGenerator {
                 parameters.add(getItemsFeedback(feedback, imgsFolder));
                 //feedbackInfo.append());
 
-                /*List<String> parametersPrevious;
+                List<String> parametersPrevious;
                 for (int i = 0; i < sequence-1; i++) {
                     parametersPrevious=new ArrayList<>();
                     parametersPrevious.add(i + " ");
                     parametersPrevious.add(steps.get(i));
                     parametersPrevious.add("");
                     feedbackInfo.append(GeneralUtils.replaceHTML(rowTableTemplate, parametersPrevious));
-
-                }*/
+                    feedbackInfoOverview.append(GeneralUtils.replaceHTML(rowTableTemplate, parametersPrevious));
+                }
                 parametersAll.add("<b>"+sequence + "</b> ");
                 parametersAll.add("<b>"+actionString+"</b>");
                 parametersAll.add("<b>"+GeneralUtils.replaceHTML(feedbackMissingTemplate, parameters)+"</b>");
@@ -318,8 +323,11 @@ public class StepOutputGenerator extends HTMLOutputGenerator {
 
                 //tableInfo.append(GeneralUtils.replaceHTML(rowTableTemplate, parameters));
                 parametersTable.add(feedbackInfo.toString());
+                String myBugName=BugName.replaceAll("\\#","%23");
+                parametersTable.add(myBugName);
                 parametersTableOverview.add(""+sequence);
                 parametersTableOverview.add(feedbackInfoOverview.toString());
+                parametersTableOverview.add(myBugName);
 
             }
 
@@ -344,8 +352,14 @@ public class StepOutputGenerator extends HTMLOutputGenerator {
     public static void main(String[] args) throws Exception {
 
         //generatQualityReportForAllBugReports();
-
-        generateStepReportForOneBugReport();
+        //if (args.length == 0) {
+            if(false){
+            System.err.println("Syntax: StepOutputGenerator bugName\n");
+        } else {
+            //BugName = args[0];
+            BugName= "ATimeTracker#0.20_46";
+            generateStepReportForOneBugReport();
+        }
     }
 
 }
