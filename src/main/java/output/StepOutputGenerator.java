@@ -14,6 +14,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
+import others.AppNamesMappings;
 
 public class StepOutputGenerator extends HTMLOutputGenerator {
     protected String feedbackTemplate;
@@ -25,6 +26,11 @@ public class StepOutputGenerator extends HTMLOutputGenerator {
     protected String feedbackMissingOverviewTemplate;
     protected String rowListTemplate;
     protected String TableListTemplate;
+
+    protected String Q0Template;
+    protected String Q1Template;
+    protected String Q2Template;
+    protected String QUsabilityTemplate;
 
     protected static String BugName;
     protected static String Path="/Users/mdipenta/euler-data/";
@@ -63,6 +69,13 @@ public class StepOutputGenerator extends HTMLOutputGenerator {
         rowListTemplate =FileUtils.readFileToString(new File("html_template/row_list.html"),Charset.defaultCharset());
         TableListTemplate =FileUtils.readFileToString(new File("html_template/table_list.html"),Charset.defaultCharset());
 
+        Q0Template=FileUtils.readFileToString(new File("html_template/Q0_template.html"),Charset.defaultCharset());
+        Q1Template=FileUtils.readFileToString(new File("html_template/Q1_template.html"),Charset.defaultCharset());
+        Q2Template=FileUtils.readFileToString(new File("html_template/Q2_template.html"),Charset.defaultCharset());
+        QUsabilityTemplate=FileUtils.readFileToString(new File("html_template/QUsability_template.html"),Charset.defaultCharset());
+
+
+
 //        final String parentFolder = outputFile.getParent();
 //        final File imgsFolder = Paths.get(parentFolder, "html_imgs").toFile();
 //        if (!imgsFolder.exists()) {
@@ -76,12 +89,69 @@ public class StepOutputGenerator extends HTMLOutputGenerator {
         //parameters.add(qualityReport.getBugReport().getId());
         //parameters.add(qualityReport.getBugReport().getTitle());
         //parameters.add(getHTMLBugDescription(qualityReport));
-        getTableInfo(bugFolder, qualityReport.getS2RQualityFeedback());
+
+        generateQ0(bugFolder,qualityReport);
+        generateQ1(bugFolder,qualityReport);
+        generateQ2(bugFolder,qualityReport);
+        generateQUsability(bugFolder,qualityReport);
+        generateTableInfo(bugFolder, qualityReport.getS2RQualityFeedback());
 
 
         //String finalReport = GeneralUtils.replaceHTML(htmlTemplate, parameters);
         //FileUtils.write(outputFile, finalReport, Charset.defaultCharset());
 
+    }
+
+
+    protected void generateQ0(File bugFolder, BRQualityReport qualityReport ) throws IOException
+    {
+        List<String> parameters=new ArrayList<>();
+
+        parameters.add(qualityReport.getBugReport().getId());
+        parameters.add(qualityReport.getBugReport().getTitle());
+        parameters.add(AppNamesMappings.normalizeAppName(qualityReport.getAppName())+" v. "+qualityReport.getAppVersion());
+
+
+        String Report=GeneralUtils.replaceHTML(Q0Template, parameters);
+        File outputFile = Paths.get(bugFolder.getAbsolutePath(), bugFolder.getName() + "_Q0.html").toFile();
+        FileUtils.write(outputFile, Report, Charset.defaultCharset());
+    }
+
+    protected void generateQ1(File bugFolder, BRQualityReport qualityReport ) throws IOException
+    {
+        List<String> parameters=new ArrayList<>();
+
+        String myBugName=BugName.replaceAll("\\#","%23");
+        parameters.add(myBugName);
+
+        String Report=GeneralUtils.replaceHTML(Q1Template, parameters);
+        File outputFile = Paths.get(bugFolder.getAbsolutePath(), bugFolder.getName() + "_Q1.html").toFile();
+        FileUtils.write(outputFile, Report, Charset.defaultCharset());
+    }
+
+
+    protected void generateQ2(File bugFolder, BRQualityReport qualityReport ) throws IOException
+    {
+        List<String> parameters=new ArrayList<>();
+
+        String myBugName=BugName.replaceAll("\\#","%23");
+        parameters.add(myBugName);
+
+        String Report=GeneralUtils.replaceHTML(Q2Template, parameters);
+        File outputFile = Paths.get(bugFolder.getAbsolutePath(), bugFolder.getName() + "_Q2.html").toFile();
+        FileUtils.write(outputFile, Report, Charset.defaultCharset());
+    }
+
+    protected void generateQUsability(File bugFolder, BRQualityReport qualityReport ) throws IOException
+    {
+        List<String> parameters=new ArrayList<>();
+
+        String myBugName=BugName.replaceAll("\\#","%23");
+        parameters.add(myBugName);
+
+        String Report=GeneralUtils.replaceHTML(QUsabilityTemplate, parameters);
+        File outputFile = Paths.get(bugFolder.getAbsolutePath(), bugFolder.getName() + "_QUsability.html").toFile();
+        FileUtils.write(outputFile, Report, Charset.defaultCharset());
     }
 
     private String getHTMLBugDescription(BRQualityReport qualityReport) {
@@ -90,7 +160,7 @@ public class StepOutputGenerator extends HTMLOutputGenerator {
                 .replace("\n", "</br>");
     }
 
-    private void getTableInfo(File bugFolder,
+    private void generateTableInfo(File bugFolder,
                                 List<S2RQualityFeedback> s2rQualityFeedback) throws IOException {
         //StringBuilder tableInfo = new StringBuilder();
 
@@ -115,6 +185,7 @@ public class StepOutputGenerator extends HTMLOutputGenerator {
             //tableInfo.append(GeneralUtils.replaceHTML(rowTableTemplate, parameters));
             //tableInfo.append(myTab);
             generateSequence(steps,bugFolder,sequence);
+
             sequence++;
         }
 
@@ -138,18 +209,19 @@ public class StepOutputGenerator extends HTMLOutputGenerator {
             parameters=new ArrayList<>();
             if(x<sequence) {
                 //parameters.add(""+x);
-                parameters.add(steps.get(x-1));
+                parameters.add(""+x+". "+steps.get(x-1));
             }
             else
             {
-                //parameters.add("<b>"+x+"</b>");
-                parameters.add("<b>"+steps.get(x-1)+"</b>");
+                parameters.add("<b>"+x+". "+steps.get(x-1)+"</b>");
             }
 
             rowBuilder.append(GeneralUtils.replaceHTML(rowListTemplate, parameters));
         }
         parametersTable.add(""+sequence);
         parametersTable.add(rowBuilder.toString());
+        String myBugName=BugName.replaceAll("\\#","%23");
+        parametersTable.add(myBugName);
         tableReport=GeneralUtils.replaceHTML(TableListTemplate, parametersTable);
 
         File outputFile = Paths.get(bugFolder.getAbsolutePath(), bugFolder.getName() + "_List_" + sequence  + ".html").toFile();
@@ -352,12 +424,12 @@ public class StepOutputGenerator extends HTMLOutputGenerator {
     public static void main(String[] args) throws Exception {
 
         //generatQualityReportForAllBugReports();
-        //if (args.length == 0) {
-            if(false){
+        if (args.length == 0) {
+        //    if(false){
             System.err.println("Syntax: StepOutputGenerator bugName\n");
         } else {
-            //BugName = args[0];
-            BugName= "ATimeTracker#0.20_46";
+            BugName = args[0];
+            //BugName= "ATimeTracker#0.20_46";
             generateStepReportForOneBugReport();
         }
     }

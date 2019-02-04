@@ -402,7 +402,7 @@ public class HTMLOutputGenerator extends EulerOutputGenerator {
             if (jsonReportFile.exists()) {
                 LOGGER.debug(jsonReportFile.getAbsolutePath());
 
-                System.out.println("ciao");
+
                 generator.generateOutput(bugFolder);
             }
         }
