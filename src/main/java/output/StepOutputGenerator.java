@@ -329,21 +329,15 @@ public class StepOutputGenerator extends HTMLOutputGenerator {
 
 
         int assess=0;
+        int numMissing=0;
 
         StringBuilder feedbackInfo = new StringBuilder();
         StringBuilder feedbackInfoOverview = new StringBuilder();
 
-        File outputFile = Paths.get(bugFolder.getAbsolutePath(), bugFolder.getName() + "_Action_" + sequence + "_Missing_" + assess + ".html").toFile();
 
-        File outputFileOverview = Paths.get(bugFolder.getAbsolutePath(), bugFolder.getName() + "_Action_" + sequence + "_Feed_" + assess + ".html").toFile();
+        File outputFile=null;
+        File outputFileOverview=null;
 
-
-        final String parentFolder = outputFile.getParent();
-        final File imgsFolder = Paths.get(parentFolder, "html_imgs").toFile();
-        if (!imgsFolder.exists()) {
-            final boolean folderCreated = imgsFolder.mkdirs();
-            if (!folderCreated) throw new IOException("Could not create the imgs folder: " + imgsFolder);
-        }
 
 
         parametersTable = new ArrayList<>();
@@ -351,16 +345,24 @@ public class StepOutputGenerator extends HTMLOutputGenerator {
 
         for (S2RQualityAssessment feedback : qualityAssessments) {
 
-
+            assess++;
 
 
             if(feedback.getCategory()==S2RQualityCategory.MISSING) {
                 //StringBuilder tableInfo = new StringBuilder();
 
-                assess++;
 
+                numMissing++;
 
-//
+                outputFile = Paths.get(bugFolder.getAbsolutePath(), bugFolder.getName() + "_Action_" + sequence + "_Missing_" + assess + ".html").toFile();
+                outputFileOverview = Paths.get(bugFolder.getAbsolutePath(), bugFolder.getName() + "_Action_" + sequence + "_Feed_" + assess + ".html").toFile();
+
+                final String parentFolder = outputFile.getParent();
+                final File imgsFolder = Paths.get(parentFolder, "html_imgs").toFile();
+                if (!imgsFolder.exists()) {
+                    final boolean folderCreated = imgsFolder.mkdirs();
+                    if (!folderCreated) throw new IOException("Could not create the imgs folder: " + imgsFolder);
+                }
 
 
                 parametersAll = new ArrayList<>();
@@ -408,9 +410,10 @@ public class StepOutputGenerator extends HTMLOutputGenerator {
         }
 
 
-        if(assess>0) {
+        if(numMissing>0) {
             String finalReport = GeneralUtils.replaceHTML(missingTemplate, parametersTable);
             String OverviewReport = GeneralUtils.replaceHTML(htmlTemplate, parametersTableOverview);
+
             FileUtils.write(outputFile, finalReport, Charset.defaultCharset());
             FileUtils.write(outputFileOverview, OverviewReport, Charset.defaultCharset());
         }
