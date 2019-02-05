@@ -15,6 +15,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import others.AppNamesMappings;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class StepOutputGenerator extends HTMLOutputGenerator {
     protected String feedbackTemplate;
@@ -33,12 +35,12 @@ public class StepOutputGenerator extends HTMLOutputGenerator {
     protected String QUsabilityTemplate;
 
     protected static String BugName;
-    protected static String Path="/Users/mdipenta/euler-data/";
+    protected static String Path="/Users/mdipenta/euler-data/tool-output/";
 
     private static void generateStepReportForOneBugReport() {
         StepOutputGenerator generator = new StepOutputGenerator();
         try {
-            File bugFolder = new File(Path+"ATimeTracker#0.20_46");
+            File bugFolder = new File(Path+BugName);
             generator.generateOutput(bugFolder);
         } catch (Exception e) {
             e.printStackTrace();
@@ -374,10 +376,10 @@ public class StepOutputGenerator extends HTMLOutputGenerator {
                 //feedbackInfo.append());
 
                 List<String> parametersPrevious;
-                for (int i = 0; i < sequence-1; i++) {
+                for (int i = 1; i < sequence; i++) {
                     parametersPrevious=new ArrayList<>();
                     parametersPrevious.add(i + " ");
-                    parametersPrevious.add(steps.get(i));
+                    parametersPrevious.add(steps.get(i-1));
                     parametersPrevious.add("");
                     feedbackInfo.append(GeneralUtils.replaceHTML(rowTableTemplate, parametersPrevious));
                     feedbackInfoOverview.append(GeneralUtils.replaceHTML(rowTableTemplate, parametersPrevious));
@@ -417,21 +419,40 @@ public class StepOutputGenerator extends HTMLOutputGenerator {
     }
 
 
+    private static void generatQualityReportForAllBugReports() throws Exception {
+        String outFolder = Path;
+        StepOutputGenerator generator = new StepOutputGenerator();
+
+        final File[] subFolders = new File(outFolder).listFiles(File::isDirectory);
+        for (File bugFolder : subFolders) {
+            File jsonReportFile = Paths.get(bugFolder.getAbsolutePath(),
+                    bugFolder.getName() + ".json").toFile();
+            if (jsonReportFile.exists()) {
+                LOGGER.debug(jsonReportFile.getAbsolutePath());
+                String line=bugFolder.toString();
+                String pattern ="([^\\/]+)$";
+                Pattern r=Pattern.compile(pattern);
+                Matcher m = r.matcher(line);
+                if (m.find( )) {
+                    BugName=m.group(0);
+                    generator.generateOutput(bugFolder);
+                }
+
+                //System.out.println(bugFolder.toString());
+                //generator.generateOutput(bugFolder);
+
+
+            }
+        }
+    }
 
 
 
 
     public static void main(String[] args) throws Exception {
 
-        //generatQualityReportForAllBugReports();
-        if (args.length == 0) {
-        //    if(false){
-            System.err.println("Syntax: StepOutputGenerator bugName\n");
-        } else {
-            BugName = args[0];
-            //BugName= "ATimeTracker#0.20_46";
-            generateStepReportForOneBugReport();
-        }
+            generatQualityReportForAllBugReports();
+
     }
 
 }
