@@ -430,7 +430,7 @@ public class StepOutputGenerator extends HTMLOutputGenerator {
             if (jsonReportFile.exists()) {
                 LOGGER.debug(jsonReportFile.getAbsolutePath());
                 String line=bugFolder.toString();
-                String pattern ="([^\\/]+)$";
+                String pattern ="([^\\/\\\\]+)$";
                 Pattern r=Pattern.compile(pattern);
                 Matcher m = r.matcher(line);
                 if (m.find( )) {
